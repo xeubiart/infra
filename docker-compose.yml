@@ -23,6 +23,7 @@ services:
     image: ghcr.io/xeubiart/backend:latest
     container_name: backend
     environment:
+      - ENV_MODE=prod
       - SPRING_PROFILES_ACTIVE=prod
       - ENABLE_EMAILS=true
       - DB_USER=${DB_USER}
