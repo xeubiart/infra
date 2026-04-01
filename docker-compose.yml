@@ -1,0 +1,59 @@
+name: xeubiart
+
+services:
+  # --- DATABASE ---
+  db:
+    image: postgres:15-alpine
+    container_name: xeubiart-db
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - xeubiart-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: ghcr.io/xeubiart/backend:latest
+    container_name: backend
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - ENABLE_EMAILS=true
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - xeubiart-network
+
+  web-app:
+    image: ghcr.io/xeubiart/website:latest
+    container_name: website
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./certs:/app/certs
+    environment:
+      - ENV_MODE=prod
+      - BACKEND_URL=http://backend:8080
+    depends_on:
+      - backend
+    networks:
+      - xeubiart-network
+
+networks:
+  xeubiart-network:
+    driver: bridge
