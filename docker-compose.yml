@@ -5,6 +5,8 @@ services:
   db:
     image: postgres:15-alpine
     container_name: xeubiart-db
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
@@ -39,7 +41,7 @@ services:
     networks:
       - xeubiart-network
 
-  web-app:
+  website:
     image: ghcr.io/xeubiart/website:latest
     container_name: website
     ports:
