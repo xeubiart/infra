@@ -1,0 +1,4 @@
+Contact: mailto:hi@xeubiart.com
+Expires: 2027-04-06T15:00:00.000Z
+Preferred-Languages: pt, en
+Canonical: https://xeubiart.com/.well-known/security.txt

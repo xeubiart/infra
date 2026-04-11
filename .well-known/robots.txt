@@ -1,0 +1,28 @@
+# ==========================================
+# Robots.txt for Xeubiart Studio - Porto
+# ==========================================
+
+# Group 1: Modern AI & Search (The VIPs)
+# We want these to index the studio for "Fine-line tattoos in Porto"
+User-agent: Googlebot
+User-agent: bingbot
+User-agent: GPTBot
+User-agent: Google-Extended
+Allow: /
+Allow: /file/static/
+
+# Group 2: The "Scrapers" (Bandwidth wasters)
+# These bots often crawl too fast or steal content for spam sites
+User-agent: CCBot
+User-agent: Amazonbot
+Disallow: /
+
+# Group 3: Global Rules
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /auth/
+Disallow: /private/
+
+# The Map: Tell them exactly where the sitemap is
+Sitemap: https://xeubiart.com/sitemap.xml

@@ -1,4 +1,6 @@
-name: xeubiart
+# It should be only used for a local sanity check
+
+name: xeubiart-local
 
 services:
   # --- DATABASE ---
@@ -16,13 +18,16 @@ services:
     networks:
       - xeubiart-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin} -d ${DB_NAME:-xeubiart}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  # --- SPRING BACKEND ---
   backend:
-    image: ghcr.io/xeubiart/backend:latest
+    build: 
+      context: ../backend
+      dockerfile: Dockerfile
     container_name: backend
     environment:
       - ENV_MODE=prod
@@ -41,22 +46,25 @@ services:
     networks:
       - xeubiart-network
 
+  # --- MCP SERVER ---
   mcp:
-    image: ghcr.io/xeubiart/mcp:latest
+    build:
+      context: ../mcp
+      dockerfile: Dockerfile
     container_name: mcp
-    restart: always
     environment:
       - BACKEND_URL=http://backend:8080
       - PORT=5001
-    expose:
-      - "5001"
-    depends_on:
-      - backend
     networks: 
       - xeubiart-network
+    depends_on:
+      - backend
 
+  # --- GO WEBSITE ---
   website:
-    image: ghcr.io/xeubiart/website:latest
+    build:
+      context: ../website
+      dockerfile: Dockerfile
     container_name: website
     environment:
       - ENV_MODE=prod
@@ -66,23 +74,24 @@ services:
     networks:
       - xeubiart-network
 
+  # --- CADDY (Local Proxy) ---
   caddy:
     image: caddy:latest
-    restart: unless-stopped
+    container_name: caddy
     ports:
       - "80:80"
       - "443:443"
-      - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./.well-known:/var/www/well-known
       - caddy_data:/data
       - caddy_config:/config 
-    depends_on:
-      - website
-      - backend
-      - mcp
     networks: 
       - xeubiart-network
+    depends_on:
+      - backend
+      - website
+      - mcp
 
 networks:
   xeubiart-network:

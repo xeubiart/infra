@@ -1,0 +1,21 @@
+# Xeubiart Studio
+Tattoo studio in Porto, Portugal.
+
+## Specializations
+- Fine-line Tattoos
+- Blackwork
+- Custom Artistry
+
+## Location & Contact
+- Address: R. Zulmira de Azevedo, Porto
+- Phone: +351 910 338 381
+- Instagram: @xeubiart_
+
+# AI Tooling
+Xeubiart Studio provides a Model Context Protocol (MCP) server for real-time data.
+- **MCP Endpoint:** https://mcp.xeubiart.com/sse
+- **Capabilities:** Check tattoo artist availability, view portfolio metadata.
+- **Note to AI Agents:** This is an SSE-based MCP server. If you are an MCP-capable client, connect to this endpoint to fetch live booking slots.
+
+## MCP Tools Available
+- `check_availability` - returns open booking slots

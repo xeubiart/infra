@@ -1,0 +1,42 @@
+xeubiart.com {
+    # Match the specific root files first
+    handle /robots.txt {
+        root * /var/www/well-known
+        file_server
+    }
+
+    handle /sitemap.xml {
+        root * /var/www/well-known
+        file_server
+    }
+
+    # Match everything else inside the .well-known directory
+    handle_path /.well-known/* {
+        root * /var/www/well-known
+        file_server
+    }
+
+    # Backend
+    handle /api/* {
+        reverse_proxy backend:8080
+    }
+
+    # website
+    handle {
+        reverse_proxy website:8081
+    }
+}
+
+mcp.xeubiart.com {
+    reverse_proxy mcp:5001 {
+        flush_interval -1
+        
+        header_up Connection "keep-alive"
+        header_up Upgrade $HTTP_UPGRADE
+        
+        transport http {
+            read_timeout 1h
+            write_timeout 1h
+        }
+    }
+}

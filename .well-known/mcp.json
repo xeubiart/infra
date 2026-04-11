@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "xeubiart": {
+      "url": "https://mcp.xeubiart.com/mcp",
+      "transport": "http-sse",
+      "name": "Xeubiart Studio",
+      "description": "Book appointments, browse portfolio and flash tattoos at Xeubiart fine-line tattoo studio in Porto.",
+      "version": "1.0.0"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option java_package = "com.teuzin.demo.proto";
+option java_multiple_files = true;
+option go_package = "./proto";
+
+package userInfo;
+
+service UserInfo {
+  rpc GetUsername (SessionToken) returns (GetUsernameOutput);
+  rpc HasProposal (SessionToken) returns (HasProposalOutput);
+}
+
+message SessionToken {
+  string tokeb = 1;
+}
+
+message GetUsernameOutput {
+  string username = 1;
+}
+
+message HasProposalOutput {
+  bool hasProposal = 1;
+}
