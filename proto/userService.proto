@@ -12,7 +12,7 @@ service UserInfo {
 }
 
 message SessionToken {
-  string tokeb = 1;
+  string token = 1;
 }
 
 message GetUsernameOutput {

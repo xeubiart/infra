@@ -7,8 +7,6 @@ services:
   db:
     image: postgres:15-alpine
     container_name: xeubiart-db
-    ports:
-      - "5432:5432"
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
@@ -18,14 +16,27 @@ services:
     networks:
       - xeubiart-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin} -d ${DB_NAME:-xeubiart}"]
+      test:
+        ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin} -d ${DB_NAME:-xeubiart}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  cache:
+    image: redis:7-alpine
+    container_name: xeubiart-cache
+    restart: always
+    networks:
+      - xeubiart-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   # --- SPRING BACKEND ---
   backend:
-    build: 
+    build:
       context: ../backend
       dockerfile: Dockerfile
     container_name: backend
@@ -43,6 +54,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      cache:
+        condition: service_healthy
     networks:
       - xeubiart-network
 
@@ -55,7 +68,7 @@ services:
     environment:
       - BACKEND_URL=http://backend:8080
       - PORT=5001
-    networks: 
+    networks:
       - xeubiart-network
     depends_on:
       - backend
@@ -68,7 +81,7 @@ services:
     container_name: website
     environment:
       - ENV_MODE=prod
-      - BACKEND_URL=http://backend:8080
+      - BACKEND_URL=backend:50051
     depends_on:
       - backend
     networks:
@@ -85,8 +98,8 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./.well-known:/var/www/well-known
       - caddy_data:/data
-      - caddy_config:/config 
-    networks: 
+      - caddy_config:/config
+    networks:
       - xeubiart-network
     depends_on:
       - backend
