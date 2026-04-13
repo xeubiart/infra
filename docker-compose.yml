@@ -5,8 +5,6 @@ services:
   db:
     image: postgres:15-alpine
     container_name: xeubiart-db
-    ports:
-      - "5432:5432"
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
@@ -21,6 +19,20 @@ services:
       timeout: 5s
       retries: 5
 
+  # --- REDIS ---
+  cache:
+    image: redis:7-alpine
+    container_name: xeubiart-cache
+    restart: always
+    networks:
+      - xeubiart-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # --- SPRING BACKEND ---
   backend:
     image: ghcr.io/xeubiart/backend:latest
     container_name: backend
@@ -31,6 +43,7 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASS}
       - DB_NAME=${DB_NAME}
+      - SPRING_DATA_REDIS_HOST=cache
       - EMAIL_HOST=${EMAIL_HOST}
       - EMAIL_PORT=${EMAIL_PORT}
       - EMAIL_USER=${EMAIL_USER}
@@ -38,36 +51,41 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      cache:
+        condition: service_healthy
     networks:
       - xeubiart-network
 
-  mcp:
-    image: ghcr.io/xeubiart/mcp:latest
-    container_name: mcp
-    restart: always
-    environment:
-      - BACKEND_URL=http://backend:8080
-      - PORT=5001
-    expose:
-      - "5001"
-    depends_on:
-      - backend
-    networks: 
-      - xeubiart-network
+  # --- MCP SERVER ---
+  # mcp:
+  #   image: ghcr.io/xeubiart/mcp:latest
+  #   container_name: mcp
+  #   restart: always
+  #   environment:
+  #     - BACKEND_URL=http://backend:8080
+  #     - PORT=5001
+  #   depends_on:
+  #     - backend
+  #   networks: 
+  #     - xeubiart-network
 
+  # --- GO WEBSITE ---
   website:
     image: ghcr.io/xeubiart/website:latest
     container_name: website
     environment:
       - ENV_MODE=prod
       - BACKEND_URL=http://backend:8080
+      - BACKEND_GRPC_URL=backend:50051 
     depends_on:
       - backend
     networks:
       - xeubiart-network
 
+  # --- CADDY ---
   caddy:
     image: caddy:latest
+    container_name: caddy
     restart: unless-stopped
     ports:
       - "80:80"
@@ -80,7 +98,7 @@ services:
     depends_on:
       - website
       - backend
-      - mcp
+      # - mcp
     networks: 
       - xeubiart-network
 
