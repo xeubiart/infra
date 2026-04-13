@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 option java_package = "com.xeubiart.proto";
 option java_multiple_files = true;
 option go_package = "./proto";
@@ -7,12 +9,8 @@ option go_package = "./proto";
 package userInfo;
 
 service UserInfo {
-  rpc GetUsername (SessionToken) returns (GetUsernameOutput);
-  rpc HasProposal (SessionToken) returns (HasProposalOutput);
-}
-
-message SessionToken {
-  string token = 1;
+  rpc GetUsername (google.protobuf.Empty) returns (GetUsernameOutput);
+  rpc HasProposal (google.protobuf.Empty) returns (HasProposalOutput);
 }
 
 message GetUsernameOutput {
