@@ -10,8 +10,13 @@ option java_package = "com.xeubiart.proto";
 
 service ProposalInfo {
   rpc HasProposal(google.protobuf.Empty) returns (HasProposalOutput);
+  rpc GetProposal(google.protobuf.Empty) returns (GetProposalOutput);
 }
 
 message HasProposalOutput {
   bool hasProposal = 1;
+}
+
+message GetProposalOutput {
+  int32 remainingSeconds = 1;
 }
