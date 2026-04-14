@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package userInfo;
+package proposalInfo;
 
 import "google/protobuf/empty.proto";
 
@@ -8,10 +8,10 @@ option go_package = "./proto";
 option java_multiple_files = true;
 option java_package = "com.xeubiart.proto";
 
-service UserInfo {
-  rpc GetUsername(google.protobuf.Empty) returns (GetUsernameOutput);
+service ProposalInfo {
+  rpc HasProposal(google.protobuf.Empty) returns (HasProposalOutput);
 }
 
-message GetUsernameOutput {
-  string username = 1;
+message HasProposalOutput {
+  bool hasProposal = 1;
 }
