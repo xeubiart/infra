@@ -10,8 +10,13 @@ option java_package = "com.xeubiart.proto";
 
 service UserInfo {
   rpc GetUsername(google.protobuf.Empty) returns (GetUsernameOutput);
+  rpc IsAdmin(google.protobuf.Empty) returns (IsAdminOutput);
 }
 
 message GetUsernameOutput {
   string username = 1;
+}
+
+message IsAdminOutput {
+  bool isAdmin = 1;
 }

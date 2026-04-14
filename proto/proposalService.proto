@@ -18,5 +18,10 @@ message HasProposalOutput {
 }
 
 message GetProposalOutput {
-  int32 remainingSeconds = 1;
+  bool found = 1;
+  int32 remainingSeconds = 2;
+  string style = 3;
+  int32 size = 4;
+  int32 duration = 5;
+  string description = 6;
 }
